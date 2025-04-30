@@ -22,12 +22,20 @@ const guardianSchema = new Schema<Guardian>({
         type: String,
         required: true,
     },
-    relationBetweenGuardian: ["Father", "Mother", "Brother", "Uncle", "Others"]
+    relationBetweenGuardian: {
+        type: String,
+        enum: ["Father", "Mother", "Brother", "Uncle", "Others"],
+        required: true
+    }
 })
 const studentSchema = new Schema<Student>({
     id: { type: String },
     name: userNameSchema,
-    gender: ["male", "female"],
+    gender: {
+        type: String,
+        enum: ["male", "female", "others"],
+        required: true
+    },
     dateOfBirth: {
         type: String
     },
@@ -43,7 +51,10 @@ const studentSchema = new Schema<Student>({
         type: String,
         required: true
     },
-    bloodGroup: ["A-", "A+", "B-", "B+", "AB+", "AB-", "O+", "O-"],
+    bloodGroup: {
+        type: String,
+        enum: ["A-", "A+", "B-", "B+", "AB+", "AB-", "O+", "O-"]
+    },
     presentAddress: {
         type: String,
         required: true,
@@ -56,7 +67,11 @@ const studentSchema = new Schema<Student>({
     profileImg: {
         type: String,
     },
-    isActive: ["active", "blocked"]
+    isActive: {
+        type: String,
+        enum: ["active", "blocked"],
+        default: 'active'
+    }
 })
 
 const StudentModel = model<Student>("Student", studentSchema)
