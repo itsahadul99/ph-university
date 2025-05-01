@@ -132,7 +132,8 @@
 // USING ZOD VALIDATION SCHEMA SO NO NEED TO VALIDATE HERE
 import { model, Schema } from 'mongoose';
 import { StudentModel, TGuardian, TStudent, TUserName } from './student.interface';
-
+import brcrypt from 'bcrypt';
+import config from '../..';
 const userNameSchema = new Schema<TUserName>({
   fistName: { type: String, required: true, },
   middleName: { type: String },
@@ -147,6 +148,7 @@ const guardianSchema = new Schema<TGuardian>({
 
 const studentSchema = new Schema<TStudent, StudentModel>({ // for instance method pass 3 parameter TStudent, StudentModel, StudentMethods. for static method pass 2 parameter TStudent, StudentModel
   id: { type: String, unique: true },
+  password: { type: String, required: true },
   name: {
     type: userNameSchema,
     required: true,
@@ -168,6 +170,20 @@ const studentSchema = new Schema<TStudent, StudentModel>({ // for instance metho
   isActive: { type: String, default: 'active' }
 });
 
+
+// MIDDLEWARE / HOOK
+
+// this middleware will run before saving the document to the database
+studentSchema.pre("save", async function (next) {
+  const student = this; // this will refer to the current document
+  student.password = await brcrypt.hash(student.password, Number(config.bcrypt_salt_rounds));
+  next()
+})
+
+// this middleware will run after saving the document to the database
+studentSchema.post("save", function () {
+  console.log("Student saved successfully");
+})
 
 // CUSTOM INSTANCE METHOD TO CHECK IF USER EXIST OR NOT
 

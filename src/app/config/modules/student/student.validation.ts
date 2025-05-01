@@ -14,6 +14,7 @@ export const guardianValidationSchema = z.object({
 
 export const studentValidationSchema = z.object({
   id: z.string(),
+  password: z.string().min(6).max(20),
   name: nameValidationSchema,
   gender: z.enum(['male', 'female', 'others']),
   dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be in YYYY-MM-DD'),
