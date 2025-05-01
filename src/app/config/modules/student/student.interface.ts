@@ -29,8 +29,12 @@ export type TStudent = {
 
 // creating a custom interface for student model to check the existing user
 
-export type StudentMethods = {
+// export type StudentMethods = {
+//     isUserExist(id: string): Promise<TStudent | null>;
+// }
+// export type StudentModel = Model<TStudent, Record<string, never>, StudentMethods>
+
+// creating a custom static method for student model to check the existing user
+export interface StudentModel extends Model<TStudent> {
     isUserExist(id: string): Promise<TStudent | null>;
 }
-
-export type StudentModel = Model<TStudent, Record<string, never>, StudentMethods>

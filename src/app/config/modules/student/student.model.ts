@@ -131,7 +131,7 @@
 
 // USING ZOD VALIDATION SCHEMA SO NO NEED TO VALIDATE HERE
 import { model, Schema } from 'mongoose';
-import { StudentMethods, StudentModel, TGuardian, TStudent, TUserName } from './student.interface';
+import { StudentModel, TGuardian, TStudent, TUserName } from './student.interface';
 
 const userNameSchema = new Schema<TUserName>({
   fistName: { type: String, required: true, },
@@ -145,7 +145,7 @@ const guardianSchema = new Schema<TGuardian>({
   relationBetweenGuardian: { type: String, required: true }
 });
 
-const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
+const studentSchema = new Schema<TStudent, StudentModel>({ // for instance method pass 3 parameter TStudent, StudentModel, StudentMethods. for static method pass 2 parameter TStudent, StudentModel
   id: { type: String, unique: true },
   name: {
     type: userNameSchema,
@@ -168,10 +168,19 @@ const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
   isActive: { type: String, default: 'active' }
 });
 
-studentSchema.methods.isUserExist = async function (id: string) {
-  const result = await Student.findOne({ id });
+
+// CUSTOM INSTANCE METHOD TO CHECK IF USER EXIST OR NOT
+
+// studentSchema.methods.isUserExist = async function (id: string) {
+//   const result = await Student.findOne({ id });
+//   return result;
+// }
+
+
+// CUSTOM STATIC METHOD TO CHECK IF USER EXIST OR NOT
+studentSchema.statics.isUserExist = async function (id: string) {
+  const result = await this.findOne({ id });
   return result;
 }
-
 const Student = model<TStudent, StudentModel>('Student', studentSchema);
 export default Student;
