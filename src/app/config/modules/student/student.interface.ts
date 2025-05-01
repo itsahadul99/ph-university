@@ -1,7 +1,6 @@
-import { Schema, model, connect } from 'mongoose';
 export type UserName = {
     fistName: string,
-    middleName: string,
+    middleName?: string,
     lastName: string,
 }
 export type Guardian = {
@@ -12,7 +11,7 @@ export type Guardian = {
 export type Student = {
     id: string,
     name: UserName,
-    gender: "male" | "female",
+    gender: "male" | "female" | "others",
     email: string,
     dateOfBirth: string,
     contactNo: string,

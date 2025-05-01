@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import { StudentServices } from "./student.service";
-
+import { studentValidationSchema } from "./student.validation";
 const getAllStudents = async (req: Request, res: Response) => {
     try {
         const result = await StudentServices.getAllStudentsFromDB();
@@ -10,7 +10,11 @@ const getAllStudents = async (req: Request, res: Response) => {
             data: result
         })
     } catch (error) {
-        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "Something went wrong.",
+            error: error
+        })
     }
 }
 const getSingleStudent = async (req: Request, res: Response) => {
@@ -23,15 +27,21 @@ const getSingleStudent = async (req: Request, res: Response) => {
             data: result
         })
     } catch (error) {
-        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "Something went wrong.",
+            error: error
+        })
     }
 }
 
 const createStudent = async (req: Request, res: Response) => {
     try {
+        // Validate the data using zod validation schema
         const { student } = req.body;
+        const zodParsedData = studentValidationSchema.parse(student);
         // will call the service func to send this data
-        const result = await StudentServices.createStudentIntoDB(student)
+        const result = await StudentServices.createStudentIntoDB(zodParsedData)
         // send the res
         res.status(200).json({
             success: true,
@@ -39,7 +49,11 @@ const createStudent = async (req: Request, res: Response) => {
             data: result
         })
     } catch (error) {
-        console.log(error);
+        res.status(500).json({
+            success: false,
+            message: "Something went wrong.",
+            error: error
+        })
     }
 }
 
