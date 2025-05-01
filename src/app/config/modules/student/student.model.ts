@@ -131,21 +131,21 @@
 
 // USING ZOD VALIDATION SCHEMA SO NO NEED TO VALIDATE HERE
 import { model, Schema } from 'mongoose';
-import { Guardian, Student, UserName } from './student.interface';
+import { StudentMethods, StudentModel, TGuardian, TStudent, TUserName } from './student.interface';
 
-const userNameSchema = new Schema<UserName>({
+const userNameSchema = new Schema<TUserName>({
   fistName: { type: String, required: true, },
   middleName: { type: String },
   lastName: { type: String, required: true }
 });
 
-const guardianSchema = new Schema<Guardian>({
+const guardianSchema = new Schema<TGuardian>({
   guardianName: { type: String, required: true },
   guardianOccupation: { type: String, required: true },
   relationBetweenGuardian: { type: String, required: true }
 });
 
-const studentSchema = new Schema<Student>({
+const studentSchema = new Schema<TStudent, StudentModel, StudentMethods>({
   id: { type: String, unique: true },
   name: {
     type: userNameSchema,
@@ -168,5 +168,10 @@ const studentSchema = new Schema<Student>({
   isActive: { type: String, default: 'active' }
 });
 
-const StudentModel = model<Student>('Student', studentSchema);
-export default StudentModel;
+studentSchema.methods.isUserExist = async function (id: string) {
+  const result = await Student.findOne({ id });
+  return result;
+}
+
+const Student = model<TStudent, StudentModel>('Student', studentSchema);
+export default Student;

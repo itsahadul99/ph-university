@@ -1,16 +1,21 @@
-import { Student } from "./student.interface";
-import StudentModel from "./student.model";
+import { TStudent } from "./student.interface";
+import Student from "./student.model";
 
-const createStudentIntoDB = async (student: Student) => {
-    const result = await StudentModel.create(student)
+const createStudentIntoDB = async (studentData: TStudent) => {
+    // const result = await StudentModel.create(studentData) // this is build in method of mongoose
+    const student = new Student(studentData); // this is build in instance method of mongoose
+    if (await student.isUserExist(studentData.id)) {
+        throw new Error("Student already exists with this id")
+    }
+    const result = await student.save(); // this is build in instance method of mongoose
     return result;
 }
 const getAllStudentsFromDB = async () => {
-    const result = await StudentModel.find()
+    const result = await Student.find()
     return result;
 }
 const getSingleStudentFromDB = async (id: string) => {
-    const result = await StudentModel.find({ id })
+    const result = await Student.find({ id })
     return result;
 }
 export const StudentServices = {

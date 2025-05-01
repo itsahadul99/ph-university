@@ -1,16 +1,18 @@
-export type UserName = {
+import { Model } from "mongoose";
+
+export type TUserName = {
     fistName: string,
     middleName?: string,
     lastName: string,
 }
-export type Guardian = {
+export type TGuardian = {
     guardianName: string,
     guardianOccupation: string,
     relationBetweenGuardian: "Father" | "Mother" | "Brother" | "Uncle" | "Others"
 }
-export type Student = {
+export type TStudent = {
     id: string,
-    name: UserName,
+    name: TUserName,
     gender: "male" | "female" | "others",
     email: string,
     dateOfBirth: string,
@@ -19,8 +21,16 @@ export type Student = {
     bloodGroup?: "A-" | "A+" | "B-" | "B+" | "AB+" | "AB-" | "O+" | "O-",
     presentAddress: string,
     permanentAddress: string,
-    guardian: Guardian,
+    guardian: TGuardian,
     profileImg?: string,
     isActive: "active" | "blocked";
 }
 
+
+// creating a custom interface for student model to check the existing user
+
+export type StudentMethods = {
+    isUserExist(id: string): Promise<TStudent | null>;
+}
+
+export type StudentModel = Model<TStudent, Record<string, never>, StudentMethods>
