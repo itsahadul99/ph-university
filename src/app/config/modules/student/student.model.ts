@@ -167,7 +167,8 @@ const studentSchema = new Schema<TStudent, StudentModel>({ // for instance metho
   permanentAddress: { type: String, required: true },
   guardian: guardianSchema,
   profileImg: { type: String },
-  isActive: { type: String, default: 'active' }
+  isActive: { type: String, default: 'active' },
+  isDeleted: { type: Boolean, default: false },
 });
 
 
@@ -181,8 +182,24 @@ studentSchema.pre("save", async function (next) {
 })
 
 // this middleware will run after saving the document to the database
-studentSchema.post("save", function () {
-  console.log("Student saved successfully");
+studentSchema.post("save", function (doc, next) {
+  doc.password = '';
+  next()
+})
+// Query middleware 
+
+studentSchema.pre("find", function (next) {
+  this.find({ isDeleted: { $ne: true } }) // this will refer to the current query
+  next()
+})
+studentSchema.pre("findOne", function (next) {
+  this.find({ isDeleted: { $ne: true } }) // this will refer to the current query
+  next()
+})
+
+studentSchema.pre("aggregate", function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } }) // this will refer to the current query
+  next()
 })
 
 // CUSTOM INSTANCE METHOD TO CHECK IF USER EXIST OR NOT

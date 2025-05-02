@@ -26,5 +26,6 @@ export const studentValidationSchema = z.object({
   permanentAddress: z.string().min(5),
   guardian: guardianValidationSchema,
   profileImg: z.string().url().regex(/\.(jpg|jpeg|png|webp)$/).optional(),
-  isActive: z.enum(['active', 'blocked'])
+  isActive: z.enum(['active', 'blocked']),
+  isDeleted: z.boolean().optional()
 });
