@@ -20,7 +20,7 @@ const getAllStudentsFromDB = async () => {
 }
 const getSingleStudentFromDB = async (id: string) => {
     // const result = await Student.findOne({ id })
-    
+
     const result = await Student.aggregate([
         { $match: { id: id } }
     ])
@@ -30,9 +30,15 @@ const deleteStudentFromDB = async (id: string) => {
     const result = await Student.updateOne({ id }, { isDeleted: true }) // this will not work because we are using query middleware to check isDeleted: false
     return result;
 }
+// update student info in DB
+const updateStudentInfoInDB = async (id: string, studentData: Partial<TStudent>) => {
+    const result = await Student.updateOne({ id }, studentData)
+    return result;
+}
 export const StudentServices = {
     createStudentIntoDB,
     getAllStudentsFromDB,
     getSingleStudentFromDB,
-    deleteStudentFromDB
+    deleteStudentFromDB,
+    updateStudentInfoInDB
 }

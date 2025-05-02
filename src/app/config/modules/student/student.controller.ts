@@ -1,6 +1,9 @@
 import { Request, Response } from "express";
 import { StudentServices } from "./student.service";
-import { studentValidationSchema } from "./student.validation";
+import { studentValidationSchema, updateStudentInfoValidationSchema } from "./student.validation";
+import { TStudent } from "./student.interface";
+
+// get all students from DB
 const getAllStudents = async (req: Request, res: Response) => {
     try {
         const result = await StudentServices.getAllStudentsFromDB();
@@ -17,7 +20,7 @@ const getAllStudents = async (req: Request, res: Response) => {
         })
     }
 }
-
+// get single student from DB
 const getSingleStudent = async (req: Request, res: Response) => {
     try {
         const { studentId } = req.params;
@@ -35,7 +38,7 @@ const getSingleStudent = async (req: Request, res: Response) => {
         })
     }
 }
-
+// create student in DB
 const createStudent = async (req: Request, res: Response) => {
     try {
         // Validate the data using zod validation schema
@@ -55,6 +58,28 @@ const createStudent = async (req: Request, res: Response) => {
             message: error.message || "Something went wrong.",
             error: error
         })
+    }
+}
+// update student info in DB
+const updateStudentInfo = async (req: Request, res: Response) => {
+    try {
+        const { student } = req.body;
+        const { studentId } = req.params;
+        // validate the data using zod validation schema
+        const zodParsedData = updateStudentInfoValidationSchema.parse(student);
+        const result = await StudentServices.updateStudentInfoInDB(studentId, zodParsedData);
+        res.status(200).json({
+            success: true,
+            message: "Student is updated successfully",
+            data: result
+        })
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || "Something went wrong.",
+            error: error
+        })
+
     }
 }
 
@@ -79,6 +104,7 @@ const deleteStudent = async (req: Request, res: Response) => {
 
 export const StudentControllers = {
     createStudent,
+    updateStudentInfo,
     getAllStudents,
     getSingleStudent,
     deleteStudent,

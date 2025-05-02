@@ -202,6 +202,16 @@ studentSchema.pre("aggregate", function (next) {
   next()
 })
 
+// check if the student is deleted or not if deleted then we are not going to update the student info
+studentSchema.pre('updateOne', async function (next) {
+    const query = this.getQuery();
+    const student = await this.model.findOne(query); // value asbe || null asbe
+    if (!student) {
+      return next(new Error("Student not found"));
+    }
+    next();
+});
+
 // CUSTOM INSTANCE METHOD TO CHECK IF USER EXIST OR NOT
 
 // studentSchema.methods.isUserExist = async function (id: string) {

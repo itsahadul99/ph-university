@@ -29,3 +29,23 @@ export const studentValidationSchema = z.object({
   isActive: z.enum(['active', 'blocked']),
   isDeleted: z.boolean().optional()
 });
+
+export const updateStudentInfoValidationSchema = z.object({
+  name: nameValidationSchema.optional(),
+  gender: z.enum(['male', 'female', 'others']).optional(),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be in YYYY-MM-DD').optional(),
+  email: z.string().email().optional(),
+  contactNo: z.string().regex(/^\d{11}$/, 'Must be 11 digits').optional(),
+  emergencyContactNo: z.string().regex(/^\d{11}$/, 'Must be 11 digits').optional(),
+  bloodGroup: z.enum(['A-', 'A+', 'B-', 'B+', 'AB+', 'AB-', 'O+', 'O-']).optional(),
+  presentAddress: z.string().min(5).optional(),
+  permanentAddress: z.string().min(5).optional(),
+  guardian: guardianValidationSchema.optional(),
+  profileImg: z.string().url().regex(/\.(jpg|jpeg|png|webp)$/).optional(),
+  isActive: z.enum(['active', 'blocked']).optional()
+}).strict();
+
+export const updatePasswordValidation = z.object({
+  oldPassword: z.string().min(6).max(20),
+  newPassword: z.string().min(6).max(20)
+});
