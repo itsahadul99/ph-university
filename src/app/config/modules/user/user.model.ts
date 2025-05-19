@@ -1,6 +1,7 @@
 import { model, Schema } from "mongoose";
 import { TUser } from "./user.interface";
-
+import config from "../..";
+import brcrypt from 'bcrypt';
 const userSchema = new Schema<TUser>({
     id: {
         type: String,
@@ -9,7 +10,7 @@ const userSchema = new Schema<TUser>({
     },
     password: {
         type: String,
-        require: true,
+        require: [true, "Password is required"],
     },
     needsPasswordChange: {
         type: Boolean,
@@ -30,6 +31,20 @@ const userSchema = new Schema<TUser>({
     }
 }, {
     timestamps: true,
+})
+
+
+// this middleware will run before saving the document to the database
+userSchema.pre("save", async function (next) {
+    const student = this; // this will refer to the current document
+    student.password = await brcrypt.hash(student.password, Number(config.bcrypt_salt_rounds));
+    next()
+})
+
+// this middleware will run after saving the document to the database
+userSchema.post("save", function (doc, next) {
+    doc.password = '';
+    next()
 })
 
 export const User = model<TUser>('User', userSchema)

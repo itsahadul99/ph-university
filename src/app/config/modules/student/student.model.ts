@@ -132,8 +132,7 @@
 // USING ZOD VALIDATION SCHEMA SO NO NEED TO VALIDATE HERE
 import { model, Schema } from 'mongoose';
 import { StudentModel, TGuardian, TStudent, TUserName } from './student.interface';
-import brcrypt from 'bcrypt';
-import config from '../..';
+
 const userNameSchema = new Schema<TUserName>({
   fistName: { type: String, required: true, },
   middleName: { type: String },
@@ -154,7 +153,6 @@ const studentSchema = new Schema<TStudent, StudentModel>({
     unique: true,
     ref: 'User'
   },
-  password: { type: String, required: true },
   name: {
     type: userNameSchema,
     required: true,
@@ -178,44 +176,9 @@ const studentSchema = new Schema<TStudent, StudentModel>({
 
 
 // MIDDLEWARE / HOOK
-
-// this middleware will run before saving the document to the database
-studentSchema.pre("save", async function (next) {
-  const student = this; // this will refer to the current document
-  student.password = await brcrypt.hash(student.password, Number(config.bcrypt_salt_rounds));
-  next()
-})
-
-// this middleware will run after saving the document to the database
-studentSchema.post("save", function (doc, next) {
-  doc.password = '';
-  next()
-})
 // Query middleware 
 
-studentSchema.pre("find", function (next) {
-  this.find({ isDeleted: { $ne: true } }) // this will refer to the current query
-  next()
-})
-studentSchema.pre("findOne", function (next) {
-  this.find({ isDeleted: { $ne: true } }) // this will refer to the current query
-  next()
-})
-
-studentSchema.pre("aggregate", function (next) {
-  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } }) // this will refer to the current query
-  next()
-})
-
-// check if the student is deleted or not if deleted then we are not going to update the student info
-studentSchema.pre('updateOne', async function (next) {
-  const query = this.getQuery();
-  const student = await this.model.findOne(query); // value asbe || null asbe
-  if (!student) {
-    return next(new Error("Student not found"));
-  }
-  next();
-});
+// f
 
 // CUSTOM INSTANCE METHOD TO CHECK IF USER EXIST OR NOT
 
