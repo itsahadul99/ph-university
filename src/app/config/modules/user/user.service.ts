@@ -1,13 +1,35 @@
-const createStudentIntoDB = async (studentData: TStudent) => {
-    // CUSTOM STATIC METHOD TO CHECK IF USER EXIST OR NOT
-    if (await Student.isUserExist(studentData.id)) {
-        throw new Error("Student already exists with this id")
+import config from "../..";
+import { TStudent } from "../student/student.interface";
+import Student from "../student/student.model";
+import { TUser } from "./user.interface";
+import { User } from "./user.model";
+
+const createStudentIntoDB = async (password: string, studentData: TStudent) => {
+
+    const userData: Partial<TUser> = {}
+
+    // if password then use it otherwise use default password
+    userData.password = password || config.default_password as string;
+
+    // set student role
+    userData.role = 'student';
+
+    // manually set the id
+    userData.id = '203010001'
+
+    // Create the userData
+    const newUser = await User.create(userData)
+    // create a student if userData create successfully
+    if (Object.keys(newUser).length) {
+        studentData.id = newUser.id;
+        studentData.user = newUser._id;
+        // create the student
+        const newStudent = await Student.create(studentData);
+        return newStudent;
     }
-    const result = await Student.create(studentData) // this is build in method of mongoose
-    // const student = new Student(studentData); // this is build in instance method of mongoose
-    // if (await student.isUserExist(studentData.id)) {
-    //     throw new Error("Student already exists with this id")
-    // }
-    // const result = await student.save(); // this is build in instance method of mongoose
-    return result;
+    return newUser;
+}
+
+export const UserServices = {
+    createStudentIntoDB
 }

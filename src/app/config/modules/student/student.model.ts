@@ -146,8 +146,14 @@ const guardianSchema = new Schema<TGuardian>({
   relationBetweenGuardian: { type: String, required: true }
 });
 
-const studentSchema = new Schema<TStudent, StudentModel>({ // for instance method pass 3 parameter TStudent, StudentModel, StudentMethods. for static method pass 2 parameter TStudent, StudentModel
-  id: { type: String, unique: true },
+const studentSchema = new Schema<TStudent, StudentModel>({
+  id: { type: String, unique: true, required: true },
+  user: {
+    type: Schema.Types.ObjectId,
+    required: [true, "User id is required"],
+    unique: true,
+    ref: 'User'
+  },
   password: { type: String, required: true },
   name: {
     type: userNameSchema,
@@ -159,7 +165,7 @@ const studentSchema = new Schema<TStudent, StudentModel>({ // for instance metho
     required: true,
   },
   dateOfBirth: { type: String, required: true },
-  email: { type: String, unique: true, lowercase: true },
+  email: { type: String, required: [true, "Email is required"], unique: true, lowercase: true },
   contactNo: { type: String, required: true },
   emergencyContactNo: { type: String, required: true },
   bloodGroup: { type: String, required: true },
@@ -167,7 +173,6 @@ const studentSchema = new Schema<TStudent, StudentModel>({ // for instance metho
   permanentAddress: { type: String, required: true },
   guardian: guardianSchema,
   profileImg: { type: String },
-  isActive: { type: String, default: 'active' },
   isDeleted: { type: Boolean, default: false },
 });
 
@@ -204,12 +209,12 @@ studentSchema.pre("aggregate", function (next) {
 
 // check if the student is deleted or not if deleted then we are not going to update the student info
 studentSchema.pre('updateOne', async function (next) {
-    const query = this.getQuery();
-    const student = await this.model.findOne(query); // value asbe || null asbe
-    if (!student) {
-      return next(new Error("Student not found"));
-    }
-    next();
+  const query = this.getQuery();
+  const student = await this.model.findOne(query); // value asbe || null asbe
+  if (!student) {
+    return next(new Error("Student not found"));
+  }
+  next();
 });
 
 // CUSTOM INSTANCE METHOD TO CHECK IF USER EXIST OR NOT
