@@ -2,7 +2,7 @@ import httpStatus from 'http-status';
 import { catchAsync, sendResponse } from "../../utils";
 import { UserServices } from "./user.service";
 // create student in DB
-const createStudent = catchAsync(async (req, res, next) => {
+const createStudent = catchAsync(async (req, res) => {
 
     // Validate the data using zod validation schema
     const { password, student } = req.body;

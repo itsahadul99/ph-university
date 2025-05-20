@@ -1,42 +1,61 @@
-import { Model, Types } from "mongoose";
+import { Model, Types } from 'mongoose';
 
 export type TUserName = {
-    fistName: string,
-    middleName?: string,
-    lastName: string,
-}
+  firstName: string;
+  middleName: string;
+  lastName: string;
+};
+
 export type TGuardian = {
-    guardianName: string,
-    guardianOccupation: string,
-    relationBetweenGuardian: "Father" | "Mother" | "Brother" | "Uncle" | "Others"
-}
+  fatherName: string;
+  fatherOccupation: string;
+  fatherContactNo: string;
+  motherName: string;
+  motherOccupation: string;
+  motherContactNo: string;
+};
+
+export type TLocalGuardian = {
+  name: string;
+  occupation: string;
+  contactNo: string;
+  address: string;
+};
+
 export type TStudent = {
-    id: string,
-    password: string,
-    user: Types.ObjectId,
-    name: TUserName,
-    gender: "male" | "female" | "others",
-    email: string,
-    dateOfBirth: string,
-    contactNo: string,
-    emergencyContactNo: string,
-    bloodGroup?: "A-" | "A+" | "B-" | "B+" | "AB+" | "AB-" | "O+" | "O-",
-    presentAddress: string,
-    permanentAddress: string,
-    guardian: TGuardian,
-    profileImg?: string,
-    isDeleted?: boolean,
-}
+  id: string;
+  user: Types.ObjectId;
+  password: string;
+  name: TUserName;
+  gender: 'male' | 'female' | 'other';
+  dateOfBirth?: Date;
+  email: string;
+  contactNo: string;
+  emergencyContactNo: string;
+  bloogGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+  presentAddress: string;
+  permanentAddress: string;
+  guardian: TGuardian;
+  localGuardian: TLocalGuardian;
+  profileImg?: string;
+  admissionSemester: Types.ObjectId;
+  isDeleted: boolean;
+};
 
+//for creating static
 
-// creating a custom interface for student model to check the existing user
-
-// export type StudentMethods = {
-//     isUserExist(id: string): Promise<TStudent | null>;
-// }
-// export type StudentModel = Model<TStudent, Record<string, never>, StudentMethods>
-
-// creating a custom static method for student model to check the existing user
 export interface StudentModel extends Model<TStudent> {
-    isUserExist(id: string): Promise<TStudent | null>;
+  isUserExists(id: string): Promise<TStudent | null>;
 }
+
+// for creating instance
+
+// export interface StudentMethods {
+//   isUserExists(id: string): Promise<TStudent | null>;
+// }
+
+// export type StudentModel = Model<
+//   TStudent,
+//   Record<string, never>,
+//   StudentMethods
+// >;
