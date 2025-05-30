@@ -24,3 +24,11 @@ export type TAcademicSemester = {
   startMonth: TMonths;
   endMonth: TMonths;
 };
+export type TUpdateAcademicSemester = {
+  id: string,
+  name: TAcademicSemesterName | undefined;
+  code: TAcademicSemesterCode | undefined;
+  year: string | undefined;
+  startMonth: TMonths | undefined;
+  endMonth: TMonths | undefined;
+};
