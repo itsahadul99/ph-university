@@ -20,15 +20,12 @@ const updateAcademicSemesterIntoDB = async (semesterId: string, payload: TUpdate
             throw new Error("Invalid semester code !!")
         }
     }
-    const result = await AcademicSemester.updateOne({ _id: semesterId }, payload)
+    const result = await AcademicSemester.updateOne({ _id: semesterId }, payload, { new: true })
     return result;
 }
 
 const getSingleAcademicSemesterFromDB = async (id: string) => {
-    // const result = await Student.findOne({ id })
-    const result = await AcademicSemester.aggregate([
-        { $match: { _id: id } }
-    ])
+    const result = await AcademicSemester.findOne({ _id: id })
     return result;
 }
 export const AcademicSemesterService = {

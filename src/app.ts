@@ -11,7 +11,7 @@ app.use(cors())
 app.use('/api/v1', router)
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('Hello from server')
+    res.send('Hello from PH University server')
 })
 
 // global error handling middleware
