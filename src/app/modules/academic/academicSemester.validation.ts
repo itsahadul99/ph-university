@@ -18,9 +18,6 @@ const createAcademicSemesterValidationSchema = z.object({
 
 const updateAcademicSemesterValidationSchema = z.object({
     body: z.object({
-        id: z.string({
-            required_error: 'Id is required!',
-        }),
         name: z.enum([...AcademicSemesterName] as [string, ...string[]]).optional(),
         code: z.enum([...AcademicSemesterCode] as [string, ...string[]]).optional(),
         year: z.string().optional(),

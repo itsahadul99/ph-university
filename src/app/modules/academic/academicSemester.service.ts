@@ -14,17 +14,26 @@ const createAcademicSemesterIntoDB = async (payload: TAcademicSemester) => {
     const result = await AcademicSemester.create(payload)
     return result;
 }
-const updateAcademicSemesterIntoDB = async (payload: TUpdateAcademicSemester) => {
+const updateAcademicSemesterIntoDB = async (semesterId: string, payload: TUpdateAcademicSemester) => {
     if (typeof (payload.name) === 'string') {
         if (academicSemesterNameMapper[payload.name] !== payload.code) {
             throw new Error("Invalid semester code !!")
         }
     }
-    const result = await AcademicSemester.updateOne({ _id: payload.id }, payload)
+    const result = await AcademicSemester.updateOne({ _id: semesterId }, payload)
+    return result;
+}
+
+const getSingleAcademicSemesterFromDB = async (id: string) => {
+    // const result = await Student.findOne({ id })
+    const result = await AcademicSemester.aggregate([
+        { $match: { _id: id } }
+    ])
     return result;
 }
 export const AcademicSemesterService = {
     getAcademicSemesterFromDB,
     createAcademicSemesterIntoDB,
-    updateAcademicSemesterIntoDB
+    updateAcademicSemesterIntoDB,
+    getSingleAcademicSemesterFromDB
 }
