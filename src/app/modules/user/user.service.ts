@@ -13,17 +13,14 @@ const createStudentIntoDB = async (password: string, payload: TStudent) => {
 
     // if password then use it otherwise use default password
     userData.password = password || (config.default_password as string);
-
     // set student role
     userData.role = 'student';
-
     // find the academic semester 
     const admissionSemester = await AcademicSemester.findById(payload.admissionSemester)
     if (!admissionSemester) {
         throw new Error('Admission semester not found');
     }
     userData.id = await generateStudentId(admissionSemester)
-
     // Create the userData
     const newUser = await User.create(userData)
     // create a student if userData create successfully
