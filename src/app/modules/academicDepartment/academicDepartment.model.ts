@@ -1,21 +1,28 @@
 import { model, Schema } from "mongoose";
-import brcrypt from 'bcrypt';
-import config from "../../config";
+import AppError from "../../errors/AppError";
 import { TAcademicDepartment } from "./academicDepartment.interface";
 const academicDepartmentSchema = new Schema<TAcademicDepartment>({
     name: {
         type: String,
-        require: true,
+        required: true,
         unique: true,
     },
     academicFaculty: {
         type: Schema.Types.ObjectId,
         ref: 'AcademicFaculty',
-        require: true,
+        required: true,
     }
 }, {
     timestamps: true,
 })
 
+academicDepartmentSchema.pre("updateOne", async function (next) {
+    const query = this.getQuery();
+    const isDepartmentExists = await this.model.findOne(query);
+    if (!isDepartmentExists) {
+        throw new AppError(404, "This department does not exists!")
+    }
+    next()
+})
 
 export const AcademicDepartment = model<TAcademicDepartment>('AcademicDepartment', academicDepartmentSchema)

@@ -1,3 +1,4 @@
+import AppError from "../../errors/AppError";
 import { TAcademicDepartment } from "./academicDepartment.interface";
 import { AcademicDepartment } from "./academicDepartment.model";
 
@@ -9,8 +10,8 @@ const createAcademicDepartmentIntoDB = async (payload: TAcademicDepartment) => {
     const result = await AcademicDepartment.create(payload)
     return result;
 }
-const updateAcademicDepartmentIntoDB = async (semesterId: string, payload: TAcademicDepartment) => {
-    const result = await AcademicDepartment.updateOne({ _id: semesterId }, payload, { new: true })
+const updateAcademicDepartmentIntoDB = async (departmentId: string, payload: TAcademicDepartment) => {
+    const result = await AcademicDepartment.updateOne({ _id: departmentId }, payload, { new: true })
     return result;
 }
 
