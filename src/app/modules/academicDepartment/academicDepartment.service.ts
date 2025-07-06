@@ -7,6 +7,10 @@ const getAllAcademicDepartmentsFromDB = async () => {
     return result;
 }
 const createAcademicDepartmentIntoDB = async (payload: TAcademicDepartment) => {
+    const isDepartmentExists = await AcademicDepartment.findOne({ name: payload.name });
+    if (isDepartmentExists) {
+        throw new AppError(400, "Academic Department already exists!");
+    }
     const result = await AcademicDepartment.create(payload)
     return result;
 }
