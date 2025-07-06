@@ -15,7 +15,7 @@ const getAllStudentsFromDB = async () => {
 }
 const getSingleStudentFromDB = async (id: string) => {
     // const result = await Student.findOne({ id })
-    const result = await Student.find({ id }).populate("admissionSemester").populate({
+    const result = await Student.findOne({ id }).populate("admissionSemester").populate({
         path: "academicDepartment",
         populate: {
             path: "academicFaculty"
@@ -54,7 +54,30 @@ const deleteStudentFromDB = async (id: string) => {
 }
 // update student info in DB
 const updateStudentInfoInDB = async (id: string, studentData: Partial<TStudent>) => {
-    const result = await Student.updateOne({ id }, studentData)
+    const isStudentExists = await Student.isUserExists(id);
+    if (!isStudentExists) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Student not found');
+    }
+    // extract the non premetive data 
+    const { name, guardian, localGuardian, ...restOfTheStudentData } = studentData;
+    const modifiedStudentData: Record<string, unknown> = { ...restOfTheStudentData };
+    if (name && Object.keys(name).length) {
+        for (const [key, value] of Object.entries(name)) {
+            modifiedStudentData[`name.${key}`] = value;
+        }
+    }
+
+    if (guardian && Object.keys(guardian).length) {
+        for (const [key, value] of Object.entries(guardian)) {
+            modifiedStudentData[`guardian.${key}`] = value;
+        }
+    }
+    if (localGuardian && Object.keys(localGuardian).length) {
+        for (const [key, value] of Object.entries(localGuardian)) {
+            modifiedStudentData[`localGuardian.${key}`] = value;
+        }
+    }
+    const result = await Student.updateOne({ id }, modifiedStudentData, { new: true, runValidators: true });
     return result;
 }
 export const StudentServices = {

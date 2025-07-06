@@ -10,6 +10,19 @@ const userNameValidationSchema = z.object({
   middleName: z.string(),
   lastName: z.string(),
 });
+// 🧠 Optional version for updates
+const userNameOptionalSchema = z.object({
+  firstName: z
+    .string()
+    .min(1)
+    .max(20)
+    .refine((value) => /^[A-Z]/.test(value), {
+      message: 'First Name must start with a capital letter',
+    })
+    .optional(),
+  middleName: z.string().optional(),
+  lastName: z.string().optional(),
+});
 
 const guardianValidationSchema = z.object({
   fatherName: z.string(),
@@ -52,7 +65,7 @@ export const createStudentValidationSchema = z.object({
 const updateStudentInfoValidationSchema = z.object({
   body: z.object({
     student: z.object({
-      name: userNameValidationSchema.optional(),
+      name: userNameOptionalSchema.optional(),
       gender: z.enum(['male', 'female', 'others']).optional(),
       dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be in YYYY-MM-DD').optional(),
       email: z.string().email().optional(),
@@ -66,7 +79,7 @@ const updateStudentInfoValidationSchema = z.object({
       isActive: z.enum(['active', 'blocked']).optional()
     })
   })
-}).strict();
+})
 
 const updatePasswordValidation = z.object({
   oldPassword: z.string().min(6).max(20),
