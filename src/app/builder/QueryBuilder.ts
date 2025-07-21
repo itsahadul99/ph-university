@@ -1,3 +1,5 @@
+/* The QueryBuilder class in TypeScript helps construct and modify Mongoose queries based on request
+query parameters. */
 import { FilterQuery, Query } from "mongoose";
 
 class QueryBuilder<T> {

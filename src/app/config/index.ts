@@ -1,3 +1,4 @@
+/* This code snippet is a TypeScript module that is importing the `dotenv` and `path` modules. */
 import dotenv from 'dotenv'
 import path from 'path'
 dotenv.config({ path: path.join((process.cwd(), '.env')) })

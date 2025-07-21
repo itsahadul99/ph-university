@@ -1,3 +1,7 @@
+/**
+ * The above TypeScript code connects to a MongoDB database, starts a server using Express, and handles
+ * unhandled rejections and exceptions.
+ */
 import { Server } from "http";
 import app from "./app";
 import config from "./app/config";

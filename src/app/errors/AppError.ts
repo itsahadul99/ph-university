@@ -1,3 +1,4 @@
+/* The `AppError` class in TypeScript defines custom error objects with a status code and message. */
 class AppError extends Error {
     public statusCode: number;
     constructor(statusCode: number, message: string, stack = "") {

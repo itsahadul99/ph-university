@@ -1,3 +1,5 @@
+/* This TypeScript code snippet is setting up routes for different modules in an Express application.
+Here's a breakdown of what it does: */
 import { Router } from "express";
 import { UserRoutes } from "../modules/user/user.route";
 import { StudentRoutes } from "../modules/student/student.route";
