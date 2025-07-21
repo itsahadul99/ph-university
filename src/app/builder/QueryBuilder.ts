@@ -18,19 +18,32 @@ class QueryBuilder<T> {
         }
         return this;
     }
-    filter(filterableFields: Record<string, string>) {
+    filter() {
         const queryCopy = { ...this.query };
-        Object.keys(queryCopy).forEach((key) => {
-            if (key in filterableFields) {
-                const value = queryCopy[key];
-                if (value) {
-                    this.modelQuery = this.modelQuery.find({
-                        [filterableFields[key]]: value
-                    }) as Query<T[], {}, {}, unknown, "find", Record<string, never>>;
-                }
-                delete queryCopy[key];
-            }
-        });
+        const excludedFields = ["searchTerm", "page", "limit"];
+        excludedFields.forEach((field) => delete queryCopy[field]);
+        this.modelQuery = this.modelQuery.find(queryCopy) as Query<T[], {}, {}, unknown, "find", Record<string, never>>;
         return this;
     }
+
+    sort() {
+        const sortBy = this?.query?.sort || "-createdAt";
+        this.modelQuery = this.modelQuery.sort(sortBy as string);
+        return this;
+    }
+
+    paginate() {
+        const page = Number(this?.query?.page) || 1;
+        const limit = Number(this?.query?.limit) || 10;
+        const skip = (page - 1) * limit;
+        this.modelQuery = this.modelQuery.skip(skip).limit(limit);
+        return this;
+    }
+    fields(){
+        const fields = (this?.query?.fields as string)?.split(",").join(" ") || "-__v";
+        this.modelQuery = this.modelQuery.select(fields);
+        return this;
+    } 
 }
+
+export default QueryBuilder;

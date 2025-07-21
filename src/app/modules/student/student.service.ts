@@ -4,14 +4,18 @@ import { Student } from "./student.model";
 import AppError from "../../errors/AppError";
 import httpStatus from 'http-status';
 import { User } from "../user/user.model";
-const getAllStudentsFromDB = async () => {
-    const result = await Student.find().populate("admissionSemester").populate({
-        path: "academicDepartment",
-        populate: {
-            path: "academicFaculty"
-        }
-    })
-    return result;
+import QueryBuilder from "../../builder/QueryBuilder";
+const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
+    // const result = await Student.find().populate("admissionSemester").populate({
+    //     path: "academicDepartment",
+    //     populate: {
+    //         path: "academicFaculty"
+    //     }
+    // })
+    // return result;
+     const studentQuery = new QueryBuilder(Student.find(), query).search(['email', 'name.firstName', 'name.lastName', "presentAddress"]).filter().sort().paginate().fields();
+     const result = await studentQuery.modelQuery.populate("admissionSemester").populate({path: "academicDepartment", populate: { path: "academicFaculty" }});
+     return result;
 }
 const getSingleStudentFromDB = async (id: string) => {
     // const result = await Student.findOne({ id })
