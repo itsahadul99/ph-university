@@ -3,7 +3,6 @@ import { catchAsync, sendResponse } from "../../utils";
 import { UserServices } from "./user.service";
 // create student in DB
 const createStudent = catchAsync(async (req, res) => {
-
     // Validate the data using zod validation schema
     const { password, student } = req.body;
     // const zodParsedData = studentValidationSchema.parse(student);
@@ -18,6 +17,19 @@ const createStudent = catchAsync(async (req, res) => {
     })
 })
 
+const createFaculty = catchAsync(async (req, res) => {
+    const { password, faculty } = req.body;
+    // Validate the data using zod validation schema
+    const result = await UserServices.createFacultyIntoDB(password, faculty);
+    sendResponse(res, {
+        success: true,
+        status: httpStatus.OK,
+        message: "Faculty created successfully.",
+        data: result
+    })
+})
+
 export const UserControllers = {
     createStudent,
+    createFaculty
 }
