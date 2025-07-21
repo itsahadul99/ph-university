@@ -28,8 +28,20 @@ const createFaculty = catchAsync(async (req, res) => {
         data: result
     })
 })
+const createAdmin = catchAsync(async (req, res) => {
+    const { password, admin } = req.body;
+    // Validate the data using zod validation schema
+    const result = await UserServices.createAdminIntoDB(password, admin);
+    sendResponse(res, {
+        success: true,
+        status: httpStatus.OK,
+        message: "Admin created successfully.",
+        data: result
+    })
+})
 
 export const UserControllers = {
     createStudent,
-    createFaculty
+    createFaculty,
+    createAdmin,
 }
