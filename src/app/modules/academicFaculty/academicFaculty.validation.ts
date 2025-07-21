@@ -10,7 +10,7 @@ const updateAcademicFacultyValidationSchema = z.object({
         name: z.string({ invalid_type_error: "Academic faculty name is required" })
     }),
 })
-export const academicFacultyValidtions = {
+export const academicFacultyValidations = {
     createAcademicFacultyValidationSchema,
     updateAcademicFacultyValidationSchema
 }
