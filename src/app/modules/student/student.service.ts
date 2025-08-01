@@ -5,21 +5,24 @@ import AppError from "../../errors/AppError";
 import httpStatus from 'http-status';
 import { User } from "../user/user.model";
 import QueryBuilder from "../../builder/QueryBuilder";
+import { StudentSearchableFields } from "./student.constant";
 const getAllStudentsFromDB = async (query: Record<string, unknown>) => {
-    // const result = await Student.find().populate("admissionSemester").populate({
-    //     path: "academicDepartment",
-    //     populate: {
-    //         path: "academicFaculty"
-    //     }
-    // })
-    // return result;
-     const studentQuery = new QueryBuilder(Student.find(), query).search(['email', 'name.firstName', 'name.lastName', "presentAddress"]).filter().sort().paginate().fields();
-     const result = await studentQuery.modelQuery.populate("admissionSemester").populate({path: "academicDepartment", populate: { path: "academicFaculty" }});
-     return result;
+      const studnetQuery = new QueryBuilder(
+        Student.find().populate('admissionSemester'),
+        query,
+    )
+        .search(StudentSearchableFields)
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await studnetQuery.modelQuery;
+    return result;
 }
 const getSingleStudentFromDB = async (id: string) => {
     // const result = await Student.findOne({ id })
-    const result = await Student.findOne({ id }).populate("admissionSemester").populate({
+    const result = await Student.findById( id ).populate("admissionSemester").populate({
         path: "academicDepartment",
         populate: {
             path: "academicFaculty"
@@ -28,20 +31,16 @@ const getSingleStudentFromDB = async (id: string) => {
     return result;
 }
 const deleteStudentFromDB = async (id: string) => {
-    // check if student exists
-    const isStudentExists = await Student.isUserExists(id);
-    if (!isStudentExists) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Student not found');
-    }
     const session = await mongoose.startSession();
     try {
         session.startTransaction();
-
-        const result = await Student.findOneAndUpdate({ id }, { isDeleted: true }, { new: true, session }) // this will not work because we are using query middleware to check isDeleted: false
+        const result = await Student.findByIdAndUpdate( id , { isDeleted: true }, { new: true, session }) // this will not work because we are using query middleware to check isDeleted: false
         if (!result) {
             throw new AppError(httpStatus.NOT_FOUND, 'Student delete failed');
         }
-        const isUserDeleted = await User.findOneAndUpdate({ id }, { isDeleted: true }, { new: true, session })
+        // get user id from student
+        const userId = result.user;
+        const isUserDeleted = await User.findByIdAndUpdate( userId , { isDeleted: true }, { new: true, session })
         if (!isUserDeleted) {
             throw new AppError(httpStatus.NOT_FOUND, 'User delete failed');
         }
@@ -58,10 +57,6 @@ const deleteStudentFromDB = async (id: string) => {
 }
 // update student info in DB
 const updateStudentInfoInDB = async (id: string, studentData: Partial<TStudent>) => {
-    const isStudentExists = await Student.isUserExists(id);
-    if (!isStudentExists) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Student not found');
-    }
     // extract the non premetive data 
     const { name, guardian, localGuardian, ...restOfTheStudentData } = studentData;
     const modifiedStudentData: Record<string, unknown> = { ...restOfTheStudentData };
@@ -81,7 +76,7 @@ const updateStudentInfoInDB = async (id: string, studentData: Partial<TStudent>)
             modifiedStudentData[`localGuardian.${key}`] = value;
         }
     }
-    const result = await Student.updateOne({ id }, modifiedStudentData, { new: true, runValidators: true });
+    const result = await Student.findByIdAndUpdate(id , modifiedStudentData, { new: true, runValidators: true });
     return result;
 }
 export const StudentServices = {
