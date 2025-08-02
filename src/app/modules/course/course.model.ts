@@ -1,8 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 import { TCourse, TPreRequisiteCourses } from "./course.interface";
 const preRequisiteCourseSchema = new mongoose.Schema<TPreRequisiteCourses>({
-    couse: {
+    course: {
         type: Schema.Types.ObjectId,
+        ref: 'Course',
     },
     isDeleted: {
         type: Boolean,
@@ -31,7 +32,11 @@ const CourseSchema = new mongoose.Schema<TCourse>({
         required: true,
 
     },
-    preQequisiteCourses: [preRequisiteCourseSchema],
+    preRequisiteCourses: [preRequisiteCourseSchema],
+    isDeleted: {
+        type: Boolean,
+        default: false,
+    },
 }, {
     timestamps: true,
 })
