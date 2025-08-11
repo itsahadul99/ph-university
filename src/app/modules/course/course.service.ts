@@ -1,8 +1,9 @@
+import { join } from "path";
 import QueryBuilder from "../../builder/QueryBuilder";
 import AppError from "../../errors/AppError";
 import { CourseSearchableFields } from "./course.constant";
-import { TCourse } from "./course.interface";
-import { Course } from "./course.model";
+import { TCourse, TCourseFaculty } from "./course.interface";
+import { Course, CourseFaculty } from "./course.model";
 import httpStatus from "http-status";
 const createCourseIntoDB = async (payload: TCourse) => {
     const result = await Course.create(payload);
@@ -80,10 +81,27 @@ const deleteCourseFromDB = async (id: string) => {
     const result = await Course.findByIdAndUpdate(id, { isDeleted: true }, { new: true });
     return result;
 }
+
+const assignCourseWithFacultyIntoDB = async (id: string, facultyIds: Partial<TCourseFaculty>) => {
+    const result = await CourseFaculty.findByIdAndUpdate(
+        id,
+        {
+            course: id,
+            $addToSet: { faculties: { $each: facultyIds } }
+        },
+        {
+            upsert: true,
+            new: true,
+        }
+    )
+    return result;
+}
+
 export const CourseServices = {
     createCourseIntoDB,
     getAllCoursesFromDB,
     getSingleCourseFromDB,
     deleteCourseFromDB,
-    updateCourseIntoDB
+    updateCourseIntoDB,
+    assignCourseWithFacultyIntoDB
 }
