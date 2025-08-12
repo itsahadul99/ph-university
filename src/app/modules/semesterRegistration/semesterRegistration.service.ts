@@ -53,11 +53,21 @@ const getSingleSemesterRegistrationFromDB = async (id: string) => {
 }
 const updateSemesterRegistrationIntoDB = async (id: string, payload: Partial<TSemesterRegistration>) => {
     const isSemesterRegistrationExists = await SemesterRegistration.findById(id);
+    const currentSemesterRegistrationStatus = isSemesterRegistrationExists?.status;
+    const requestedStatus = payload?.status;
     if (!isSemesterRegistrationExists) {
         throw new AppError(httpStatus.NOT_FOUND, "Semester Registration not found");
     }
-    if (isSemesterRegistrationExists?.status === "ENDED") {
+    if (currentSemesterRegistrationStatus === "ENDED") {
         throw new AppError(httpStatus.BAD_REQUEST, "You cannot update an ended semester registration");
+    }
+    // UPCOMING --> ONGOING --> ENDED ( Business Logic )
+    // This logic ensures that the status can only be changed in a specific order
+    if (currentSemesterRegistrationStatus === "UPCOMING" && requestedStatus === "ENDED") {
+        throw new AppError(httpStatus.BAD_REQUEST, "You cannot change the status from UPCOMING to ENDED directly. Please change it to ONGOING first.");
+    }
+    if (currentSemesterRegistrationStatus === "ONGOING" && requestedStatus === "UPCOMING") {
+        throw new AppError(httpStatus.BAD_REQUEST, "You cannot change the status from ONGOING to UPCOMING. Please change it to ENDED first.");
     }
     const result = await SemesterRegistration.findByIdAndUpdate(id, payload, { new: true }).populate('academicSemester');
     return result;
