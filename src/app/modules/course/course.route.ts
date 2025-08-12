@@ -16,6 +16,7 @@ router.patch(
   CourseControllers.updateCourse,
 );
 router.put('/:courseId/assign-faculties', validateRequest(CourseValidation.assignCourseWithFacultyValidationSchema), CourseControllers.assignCourseWithFaculty)
+router.delete('/:courseId/remove-faculties', validateRequest(CourseValidation.assignCourseWithFacultyValidationSchema), CourseControllers.removeFacultyFromCourse)
 router.get('/', CourseControllers.getAllCourses);
 router.get('/:id', CourseControllers.getSingleCourse);
 router.delete('/:id', CourseControllers.deleteCourse);

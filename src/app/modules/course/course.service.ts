@@ -97,11 +97,26 @@ const assignCourseWithFacultyIntoDB = async (id: string, facultyIds: Partial<TCo
     return result;
 }
 
+const deleteAssignCourseFacultyFromDB = async (id: string, facultyIds: string) => {
+   const result = await CourseFaculty.findByIdAndUpdate(
+        id,
+        {
+           $pull: { faculties: { $in: facultyIds } }
+        },
+        {
+            upsert: true,
+            new: true,
+        }
+    )
+    return result;
+}
+
 export const CourseServices = {
     createCourseIntoDB,
     getAllCoursesFromDB,
     getSingleCourseFromDB,
     deleteCourseFromDB,
     updateCourseIntoDB,
-    assignCourseWithFacultyIntoDB
+    assignCourseWithFacultyIntoDB,
+    deleteAssignCourseFacultyFromDB
 }
