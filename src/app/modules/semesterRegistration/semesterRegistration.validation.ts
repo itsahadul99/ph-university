@@ -4,8 +4,8 @@ const createSemesterRegistrationValidationSchema = z.object({
     body: z.object({
         academicSemester: z.string(),
         status: z.enum([...SemesterRegistrationStatus] as [string, ...string[]]),
-        startDate: z.date(),
-        endDate: z.date(),
+        startDate: z.preprocess((arg) => new Date(arg as string | number | Date), z.date()),
+        endDate: z.preprocess((arg) => new Date(arg as string | number | Date), z.date()),
         minCredit: z.number(),
         maxCredit: z.number()
     })
