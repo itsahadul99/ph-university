@@ -1,0 +1,10 @@
+import express from 'express';
+import { validateRequest } from '../../middlewares';
+import { OfferedCourseControler } from './offeredCourse.controller';
+import { offeredCourseValidation } from './offeredCourse.validation';
+const router = express.Router();
+router.get('/', OfferedCourseControler.getAllOfferedCourses);
+router.get('/:offeredCourseId', OfferedCourseControler.getSingleOfferedCourse);
+router.post('/create-offered-course', validateRequest(offeredCourseValidation.createOfferedCourseValidationSchema), OfferedCourseControler.createOfferedCourse);
+router.patch('/:offeredCourseId', validateRequest(offeredCourseValidation.updateOfferedCourseValidationSchema), OfferedCourseControler.updateOfferedCourse);
+export const OfferedCourseRoute = router;

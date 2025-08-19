@@ -7,4 +7,4 @@ router.get('/', SemesterRegistrationControler.getAllSemesterRegistrations);
 router.get('/:semesterRegistrationId', SemesterRegistrationControler.getSingleSemesterRegistration);
 router.post('/create-semester-registration', validateRequest(semesterRegistrationValidation.createSemesterRegistrationValidationSchema), SemesterRegistrationControler.createSemesterRegistration);
 router.patch('/:semesterRegistrationId', validateRequest(semesterRegistrationValidation.updateSemesterRegistrationValidationSchema), SemesterRegistrationControler.updateSemesterRegistration);
-export const SemesterRegistration = router;
+export const SemesterRegistrationRoute = router;
