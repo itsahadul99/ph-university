@@ -9,7 +9,7 @@ import { Faculty } from "../faculty/faculty.model";
 import { AcademicFaculty } from "../academicFaculty/academicFaculty.model";
 import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
 const createofferedCourseIntoDB = async (payload: TOfferedCourse) => {
-    const { academicDepartment, course, faculty, academicFaculty, semesterRegistration } = payload;
+    const { academicDepartment, course, faculty, academicFaculty, semesterRegistration, section } = payload;
     const isSemesterRegistrationExists = await SemesterRegistration.findById(semesterRegistration);
     if (!isSemesterRegistrationExists) {
         throw new AppError(httpStatus.NOT_FOUND, "Semester Registration not found");
@@ -34,11 +34,19 @@ const createofferedCourseIntoDB = async (payload: TOfferedCourse) => {
     if (!isAcademicFacultyExists) {
         throw new AppError(httpStatus.NOT_FOUND, "Academic Faculty not found");
     }
-
-
+    // check the faculty is belogs to the academic faculty
+    const isDepartmentBelogToFaculty = await AcademicDepartment.findOne({ academicFaculty, _id: academicDepartment });
+    if (!isDepartmentBelogToFaculty) {
+        throw new AppError(httpStatus.NOT_FOUND, "Academic Department does not belong to this Academic Faculty");
+    }
     // check the academic semester is already exists for this course
     const academicSemester = isSemesterRegistrationExists.academicSemester;
 
+    // Check if the same course same section in the same semester already exists
+    const isSameOfferedCourseExistsWithSameRegisteredSemester = await OfferedCourse.findOne({ semesterRegistration, course, section })
+    if (isSameOfferedCourseExistsWithSameRegisteredSemester) {
+        throw new AppError(httpStatus.CONFLICT, "Offered Course already exists for this semester with the same course and section");
+    }
     const result = await OfferedCourse.create({ ...payload, academicSemester });
     return result;
 }
@@ -48,7 +56,8 @@ const getAllOfferedCourseFromDB = async (query: Record<string, unknown>) => {
         .populate("academicFaculty")           // populate academicFaculty (not "faculty")
         .populate("faculty")                    // populate facult
         .populate("course")                    // populate course
-        .populate("semesterRegistration");     // populate semesterRegistration
+        .populate("semesterRegistration")
+        .populate('academicDepartment')    // populate semesterRegistration
     return result;
 }
 

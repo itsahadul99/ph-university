@@ -87,7 +87,6 @@ const createFacultyIntoDB = async (password: string, payload: TFaculty) => {
         payload.user = newUser[0]._id; //reference _id
 
         // create a faculty (transaction-2)
-
         const newFaculty = await Faculty.create([payload], { session });
 
         if (!newFaculty.length) {
