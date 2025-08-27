@@ -9,7 +9,8 @@ import { Faculty } from "../faculty/faculty.model";
 import { AcademicFaculty } from "../academicFaculty/academicFaculty.model";
 import { AcademicDepartment } from "../academicDepartment/academicDepartment.model";
 const createofferedCourseIntoDB = async (payload: TOfferedCourse) => {
-    const { academicDepartment, course, faculty, academicFaculty, semesterRegistration, section } = payload;
+    const { academicDepartment, course, faculty, academicFaculty, semesterRegistration, section, days, startTime, endTime } = payload;
+
     const isSemesterRegistrationExists = await SemesterRegistration.findById(semesterRegistration);
     if (!isSemesterRegistrationExists) {
         throw new AppError(httpStatus.NOT_FOUND, "Semester Registration not found");
@@ -47,6 +48,31 @@ const createofferedCourseIntoDB = async (payload: TOfferedCourse) => {
     if (isSameOfferedCourseExistsWithSameRegisteredSemester) {
         throw new AppError(httpStatus.CONFLICT, "Offered Course already exists for this semester with the same course and section");
     }
+
+    // Get the shedule of the faculties
+    const asignSchedules = await OfferedCourse.find({
+        semesterRegistration,
+        faculty,
+        days: { $in: days }
+    }).select("days endTime startTime")
+    const newSchedule = {
+        days,
+        startTime,
+        endTime
+    }
+    // Checking.....
+    asignSchedules.forEach((schedule) => {
+        const existingStartTime = new Date(`1971-01-01T${schedule?.startTime}`);
+        const existingEndTime = new Date(`1971-01-01T${schedule?.endTime}`);
+        const newStartTime = new Date(`1971-01-01T${newSchedule?.startTime}`);
+        const newEndTime = new Date(`1971-01-01T${newSchedule?.startTime}`);
+        if (newStartTime < existingStartTime && newEndTime > existingEndTime) {
+            throw new AppError(
+                httpStatus.CONFLICT,
+                "This faculty is not available at this time. Please choice another day or time !!"
+            )
+        }
+    })
     const result = await OfferedCourse.create({ ...payload, academicSemester });
     return result;
 }
