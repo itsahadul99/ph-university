@@ -8,6 +8,11 @@ const userSchema = new Schema<TUser, UserModel>({
         require: true,
         unique: true,
     },
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+    },
     password: {
         type: String,
         require: [true, "Password is required"],

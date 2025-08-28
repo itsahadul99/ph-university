@@ -6,6 +6,7 @@ import brcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import config from "../../config";
 import { createToken } from "./auth.utils";
+import { sendEmail } from "../../utils/sendEmail";
 const loginUser = async (payload: TUser) => {
     // check if the user is exists
     const user = await User.isUserExistsByCustomId(payload.id)
@@ -100,9 +101,31 @@ const refreshToken = async (token: string) => {
         accessToken,
     }
 }
+const forgetPassword = async (userId: string) => {
+    const user = await User.isUserExistsByCustomId(userId)
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "Invalid credentials !!")
+    }
+    // check the if user already deleted
+    if (user?.isDeleted) {
+        throw new AppError(httpStatus.FORBIDDEN, "This user is deleted !!")
+    }
+    // user status
+    if (user?.status === "blocked") {
+        throw new AppError(httpStatus.FORBIDDEN, "This user is blocked !!")
+    }
+    const jwtPayload = {
+        userId: user?.id,
+        role: user?.role
+    }
+    const ressetToken = createToken(jwtPayload, config.jwt_access_secret as string, '10m')
+    const ressetUILink = `http://localhost:3000?id=${user?.id}&token=${ressetToken}`
+    sendEmail(user?.email, ressetUILink)
+}
 
 export const AuthServices = {
     loginUser,
     changePassword,
     refreshToken,
+    forgetPassword
 }
