@@ -39,9 +39,21 @@ const createAdmin = catchAsync(async (req, res) => {
         data: result
     })
 })
+const getMe = catchAsync(async (req, res) => {
+    const token = req.headers.authorization as string;
+    // Validate the data using zod validation schema
+    const result = await UserServices.getMe(token);
+    sendResponse(res, {
+        success: true,
+        status: httpStatus.OK,
+        message: "Admin created successfully.",
+        data: result
+    })
+})
 
 export const UserControllers = {
     createStudent,
     createFaculty,
     createAdmin,
+    getMe
 }

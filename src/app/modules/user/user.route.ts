@@ -12,4 +12,5 @@ const router = express.Router();
 router.post('/create-student', auth(USER_ROLE.admin), validateRequest(studentValidations.createStudentValidationSchema), UserControllers.createStudent)
 router.post('/create-faculty', validateRequest(facultyValidations.createFacultyValidationSchema), UserControllers.createFaculty);
 router.post('/create-admin', validateRequest(adminValidations.createAdminValidationSchema), UserControllers.createAdmin);
+router.get('/me', auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student), UserControllers.getMe);
 export const UserRoutes = router;

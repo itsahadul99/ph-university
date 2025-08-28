@@ -5,7 +5,7 @@ import httpStatus from "http-status";
 import brcrypt from 'bcrypt';
 import jwt, { JwtPayload } from 'jsonwebtoken'
 import config from "../../config";
-import { createToken } from "./auth.utils";
+import { createToken, verifyToken } from "./auth.utils";
 import { sendEmail } from "../../utils/sendEmail";
 const loginUser = async (payload: TUser) => {
     // check if the user is exists
@@ -74,7 +74,7 @@ const changePassword = async (userData: JwtPayload, passwordData: {
 
 const refreshToken = async (token: string) => {
     // verify the token 
-    const decoded = jwt.verify(token, config.jwt_refresh_secret as string) as JwtPayload;
+    const decoded = verifyToken(token, config.jwt_refresh_secret as string);
     const { userId, iat } = decoded;
     const user = await User.isUserExistsByCustomId(userId)
     if (!user) {
