@@ -122,10 +122,40 @@ const forgetPassword = async (userId: string) => {
     const ressetUILink = `http://localhost:3000?id=${user?.id}&token=${ressetToken}`
     sendEmail(user?.email, ressetUILink)
 }
+const ressetPassword = async (payload: { id: string, newPassword: string }, token: string) => {
+    const user = await User.isUserExistsByCustomId(payload?.id)
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "Invalid credentials !!")
+    }
+    // check the if user already deleted
+    if (user?.isDeleted) {
+        throw new AppError(httpStatus.FORBIDDEN, "This user is deleted !!")
+    }
+    // user status
+    if (user?.status === "blocked") {
+        throw new AppError(httpStatus.FORBIDDEN, "This user is blocked !!")
+    }
+    const decoded = jwt.verify(token, config.jwt_access_secret as string) as JwtPayload;
+
+    if (decoded?.userId !== payload?.id) {
+        throw new AppError(httpStatus.FORBIDDEN, "You are forbidden")
+    }
+    const newHashPassword = await brcrypt.hash(payload.newPassword, Number(config.bcrypt_salt_rounds))
+    await User.findOneAndUpdate({
+        id: decoded.userId,
+        role: decoded.role,
+    }, {
+        password: newHashPassword,
+        needsPasswordChange: false,
+        passwordChangedAt: new Date()
+    })
+    return null
+}
 
 export const AuthServices = {
     loginUser,
     changePassword,
     refreshToken,
-    forgetPassword
+    forgetPassword,
+    ressetPassword
 }
