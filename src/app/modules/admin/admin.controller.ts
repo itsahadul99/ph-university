@@ -15,6 +15,7 @@ const getSingleAdmin = catchAsync(async (req, res) => {
 });
 
 const getAllAdmins = catchAsync(async (req, res) => {
+  console.log("user from admin", req.user)
   const result = await AdminServices.getAllAdminsFromDB(req.query);
 
   sendResponse(res, {

@@ -1,5 +1,5 @@
 import express from 'express';
-import { validateRequest } from '../../middlewares';
+import { auth, validateRequest } from '../../middlewares';
 import { AdminControllers } from './admin.controller';
 import { updateAdminValidationSchema } from './admin.validation';
 
@@ -15,6 +15,6 @@ router.patch(
 
 router.delete('/:id', AdminControllers.deleteAdmin);
 
-router.get('/', AdminControllers.getAllAdmins);
+router.get('/', auth(), AdminControllers.getAllAdmins);
 
 export const AdminRoutes = router;
