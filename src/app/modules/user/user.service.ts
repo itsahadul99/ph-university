@@ -137,9 +137,9 @@ const createAdminIntoDB = async (password: string, payload: TAdmin) => {
         throw new Error(err);
     }
 };
-const getMe = async (token: string) => {
-    const decoded = verifyToken(token, config.jwt_access_secret as string)
-    const { userId, role } = decoded;
+const getMe = async (userId: string, role: string) => {
+    // const decoded = verifyToken(token, config.jwt_access_secret as string)
+    // const { userId, role } = decoded;
     let result = null;
     if (role === 'student') {
         result = await Student.findOne({ id: userId })
@@ -153,9 +153,18 @@ const getMe = async (token: string) => {
     // const result = await 
     return result;
 }
+const changeStatus = async (id: string, payload: { status: string }) => {
+    const result = await User.findByIdAndUpdate(id, {
+        status: payload.status
+    }, {
+        new: true
+    })
+    return result;
+}
 export const UserServices = {
     createStudentIntoDB,
     createFacultyIntoDB,
     createAdminIntoDB,
     getMe,
+    changeStatus,
 }

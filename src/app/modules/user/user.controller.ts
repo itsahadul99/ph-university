@@ -40,13 +40,22 @@ const createAdmin = catchAsync(async (req, res) => {
     })
 })
 const getMe = catchAsync(async (req, res) => {
-    const token = req.headers.authorization as string;
-    // Validate the data using zod validation schema
-    const result = await UserServices.getMe(token);
+    const user = req.user;
+    const result = await UserServices.getMe(user?.userId, user.role);
     sendResponse(res, {
         success: true,
         status: httpStatus.OK,
         message: "Admin created successfully.",
+        data: result
+    })
+})
+const changeStatus = catchAsync(async (req, res) => {
+    const { id } = req.params;
+    const result = await UserServices.changeStatus(id, req.body);
+    sendResponse(res, {
+        success: true,
+        status: httpStatus.OK,
+        message: "Status changed successfully.",
         data: result
     })
 })
@@ -55,5 +64,6 @@ export const UserControllers = {
     createStudent,
     createFaculty,
     createAdmin,
-    getMe
+    getMe,
+    changeStatus
 }
