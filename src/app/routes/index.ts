@@ -11,7 +11,7 @@ import { AdminRoutes } from "../modules/admin/admin.route";
 import { CourseRoute } from "../modules/course/course.route";
 import { SemesterRegistrationRoute } from "../modules/semesterRegistration/semesterRegistration.route";
 import { OfferedCourseRoute } from "../modules/offeredCourse/offeredCourse.route";
-import { AuthRoutes } from "../modules/Auth/auth.route";
+import { AuthRoutes } from "../modules/auth/auth.route";
 
 const router = Router()
 

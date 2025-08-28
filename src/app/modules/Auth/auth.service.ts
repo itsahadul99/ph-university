@@ -3,7 +3,7 @@ import { TUser } from "../user/user.interface";
 import { User } from "../user/user.model";
 import httpStatus from "http-status";
 import brcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken'
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import config from "../../config";
 const loginUser = async (payload: TUser) => {
     // check if the user is exists
@@ -28,12 +28,46 @@ const loginUser = async (payload: TUser) => {
         role: user?.role
     }
     // create token and sent to the client
-    const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, {expiresIn: "10d"})
+    const accessToken = jwt.sign(jwtPayload, config.jwt_access_secret as string, { expiresIn: "10d" })
     return {
         accessToken,
         needPasswordChange: user?.needsPasswordChange
     }
 }
+const changePassword = async (userData: JwtPayload, passwordData: {
+    oldPassword: string,
+    newPassword: string
+}) => {
+    // check if the user is exists
+    const user = await User.isUserExistsByCustomId(userData.userId)
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, "Invalid credentials !!")
+    }
+    // check the if user already deleted
+    if (user?.isDeleted) {
+        throw new AppError(httpStatus.FORBIDDEN, "This user is deleted !!")
+    }
+    // user status
+    if (user?.status === "blocked") {
+        throw new AppError(httpStatus.FORBIDDEN, "This user is blocked !!")
+    }
+    // // check the password
+    if (! await User.isPasswordMatched(passwordData?.oldPassword, user?.password)) {
+        throw new AppError(httpStatus.FORBIDDEN, "Password do not match !!")
+    }
+
+    const newHashPassword = await brcrypt.hash(passwordData.newPassword, Number(config.bcrypt_salt_rounds))
+    await User.findOneAndUpdate({
+        id: userData.userId,
+        role: userData.role,
+    }, {
+        password: newHashPassword,
+        needsPasswordChange: false,
+        passwordChangedAt: new Date()
+    })
+    return null
+}
 export const AuthServices = {
     loginUser,
+    changePassword
 }
